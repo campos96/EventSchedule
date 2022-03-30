@@ -28,6 +28,15 @@ namespace EventSchedule.API.Controllers
             return db.Presentations;
         }
 
+        public IQueryable<Presentation> GetPresentationsByStage(Guid stageId)
+        {
+            var presentations = db.Presentations
+                .Include(p => p.Artist)
+                .Include(p => p.Stage)
+                .ToList();
+            return db.Presentations.Where(a=> a.StageID == stageId).OrderBy(a => a.StartDate);
+        }
+
         // GET: api/Presentations/5
         [ResponseType(typeof(Presentation))]
         public async Task<IHttpActionResult> GetPresentation(Guid id)

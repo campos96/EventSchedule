@@ -13,5 +13,10 @@ namespace EventSchedule.API.Controllers
         {
             return View();
         }
+
+        public ActionResult Map()
+        {
+            return View();
+        }
     }
 }

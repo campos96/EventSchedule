@@ -1,0 +1,290 @@
+@{
+    Layout = "";
+}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+</head>
+
+<body style="background-color: red;">
+    <div id="map" style="height: 100vh; width: 100%;"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgPqi1h1soeGzYrMO1tL-x_oNbf9h6fZY&callback=initMap&v=weekly"
+            async></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
+    </script>
+
+    <script>
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 18,
+                center: { lat: 25.680010, lng: -100.281710 },
+                mapTypeId: "roadmap",
+            });
+            loadMap();
+        }
+
+        function loadMap() {
+            let markers = [
+                {
+                    'title': "Escenario Tecate Light",
+                    'position': new google.maps.LatLng(25.681181, -100.284804),
+                    'icon': "/Images/pin.png",
+                    'index': 'd3f44687-82cf-4cec-bfbc-6aa996cb318b'
+                },
+                {
+                    'title': "Escenario Tecate Original",
+                    'position': new google.maps.LatLng(25.681741, -100.279343),
+                    'icon': "/Images/pin.png",
+                    'index': '4170119c-313c-4f0d-901d-654479635b19'
+                },
+                {
+                    'title': "Escenario Fusion Telcel",
+                    'position': new google.maps.LatLng(25.679399, -100.277109),
+                    'icon': "/Images/pin.png",
+                    'index': 'f4fbe9dc-9cb9-42e0-8a33-5ce07518ad9a'
+                },
+                {
+                    'title': "Escenario Villa Maravilla",
+                    'position': new google.maps.LatLng(25.679558, -100.278908),
+                    'icon': "/Images/pin.png",
+                    'index': '5b92bf69-9b0d-4cd4-a94d-d286d6727468'
+                },
+                {
+                    'title': "Escenario Club Social",
+                    'position': new google.maps.LatLng(25.679804, -100.282239),
+                    'icon': "/Images/pin.png",
+                    'index': 'cb859899-ee42-4184-934c-039892bf3e10'
+                },
+                {
+                    'title': "Escenario Sorpresa",
+                    'position': new google.maps.LatLng(25.681975, -100.283462),
+                    'icon': "/Images/pin.png",
+                    'index': '933ca019-0114-4312-99d5-09b502773d30'
+                },
+                {
+                    'title': "Escenario Acustico",
+                    'position': new google.maps.LatLng(25.678432, -100.279868),
+                    'icon': "/Images/pin.png",
+                    'index': 'ce1b180e-5a71-44c2-becc-de698e779bd4'
+                },
+                {
+                    'title': "Escenario Pilo's Bar",
+                    'position': new google.maps.LatLng(25.679669, -100.280544),
+                    'icon': "/Images/pin.png",
+                    'index': 'ff03b8c7-aacb-4ce1-8d81-df16831ea2aa'
+                },
+                {
+                    'title': "Escenario Oasis",
+                    'position': new google.maps.LatLng(25.678662, -100.284097),
+                    'icon': "/Images/pin.png",
+                    'index': '0fe6b72b-94cd-48c1-8476-39ea77c1e5ad'
+                },
+            ];
+            var infoWindow = new google.maps.InfoWindow();
+            for (var i = 0; i < markers.length; i++) {
+                var markerData = markers[i];
+                var marker = new google.maps.Marker({
+                    position: markerData.position,
+                    map: map,
+                    title: markerData.title,
+                    icon: markerData.icon,
+                });
+
+                //Attach click event to the marker.
+                (function (marker, data) {
+                    google.maps.event.addListener(marker, "click", function (e) {
+                        //Wrap the content inside an HTML DIV in order to set height and width of InfoWindow.
+                        infoWindow.setContent(getActualArtist(data.index));
+                        infoWindow.open(map, marker);
+                    });
+                })(marker, markerData);
+            }
+
+            function getDateDiff(date1, date2) {
+                return Math.abs(date1 - date2) / 36e5;
+            }
+
+            function getPrettyHour(date) {
+                return date.toLocaleTimeString(navigator.language, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+
+            function getActualArtist(stageId) {
+                var stage;
+                $.ajax({
+                    url: `/api/Stages/${stageId}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    data: [],
+                    async: false,
+                    success: function (data, textStatus, xhr) {
+                        stage = data;
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log('Error in Operation');
+                    }
+                });
+                var actualDate = new Date('4/1/2022 02:45:00 PM');
+                var presentations;
+                $.ajax({
+                    url: `/api/Presentations?stageId=${stageId}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    data: [],
+                    async: false,
+                    success: function (data, textStatus, xhr) {
+                        presentations = data;
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log('Error in Operation');
+                    }
+                });
+                var actual = "";
+                var next = next = `
+                                                <h4>No hay artistas proximos<br /> en este escenario</h4>
+                                                <div class="d-flex justify-content-around">
+                                                    <p class="h6 text-center">:(</p>
+                                                </div>`;;
+                for (var i = 0; i < presentations.length; i++) {
+                    if (new Date(presentations[i].EndDate) > actualDate) {
+                        if (actualDate >= new Date(presentations[i].StartDate) && actualDate < new Date(presentations[i].EndDate)) {
+                            var duration = getDateDiff(new Date(presentations[i].StartDate), new Date(presentations[i].EndDate));
+                            var progress = getDateDiff(actualDate, new Date(presentations[i].EndDate));
+                            var percentaje = (progress * 100) / duration;
+                            console.log(`Duration: ${duration} Progress: ${progress} Percentaje: ${percentaje}`)
+                            actual = `
+                                                <h4>Ahora suena: </br> <strong>${presentations[i].Artist.Name}</strong></h4>
+                                                <div class="d-flex justify-content-center">
+                                                    <div class='progress w-75 bg-dark'>
+                                                    <div class='progress-bar progress-bar-striped progress-bar-animated bg-success' role='progressbar' aria-valuenow='75' aria-valuemin='0' aria-valuemax='100' style='width: ${(100 - percentaje)}%'></div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-around">
+                                                    <p class="h6 text-center"><strong>Inicio:</strong> </br> ${getPrettyHour(new Date(presentations[i].StartDate))}</p><p class="h6 text-center"> <strong>Final:</strong> </br> ${getPrettyHour(new Date(presentations[i].EndDate))}</p>
+                                                 </div>`;
+                        } else {
+                            next = `
+                                                <h4>Siguiente: </br> <strong>${presentations[i].Artist.Name}</strong></h4>
+                                                <div class="d-flex justify-content-around">
+                                                    <p class="h6 text-center"><strong>Inicio:</strong> </br> ${getPrettyHour(new Date(presentations[i].StartDate))}</p><p class="h6 text-center"> <strong>Final:</strong> </br> ${getPrettyHour(new Date(presentations[i].EndDate))}</p>
+                                                </div>`;
+                            break;
+                        }
+                        if (i + 1 < presentations.length) {
+                            next = `
+                                                <h4>Siguiente: </br> <strong>${presentations[i + 1].Artist.Name}</strong></h4>
+                                                <div class="d-flex justify-content-around">
+                                                    <p class="h6 text-center"><strong>Inicio:</strong> </br> ${getPrettyHour(new Date(presentations[i + 1].StartDate))}</p><p class="h6 text-center"> <strong>Final:</strong> </br> ${getPrettyHour(new Date(presentations[i + 1].EndDate))}</p>
+                                                </div>`;
+                            break;
+                        }                       
+                    }
+                }
+                const htmlStage = `
+                                                <div class="bg-light p-2 rounded text-center" id="content">
+                                                    <div id="siteNotice">
+                                                     </div>
+                                                    <h2 id="firstHeading" class="firstHeading">${stage.Name}</h2>
+                                                    <div id="bodyContent">
+                                                        ${actual}
+                                                        <hr />
+                                                        ${next}
+                                                    </div>
+                                                </div>`;
+                return htmlStage;
+            }
+            const bounds = new google.maps.LatLngBounds(
+                new google.maps.LatLng(25.677859, -100.286715),
+                new google.maps.LatLng(25.682948, -100.276132)
+            );
+            const srcImage =
+                "/Images/palnorte-map.png";
+
+            class USGSOverlay extends google.maps.OverlayView {
+                bounds_;
+                image_;
+                div_;
+                constructor(bounds, image) {
+                    super();
+
+                    this.bounds_ = bounds;
+                    this.image_ = image;
+                    this.div_ = null;
+                }
+
+                onAdd() {
+                    this.div_ = document.createElement("div");
+                    this.div_.style.borderStyle = "none";
+                    this.div_.style.borderWidth = "0px";
+                    this.div_.style.position = "absolute";
+
+                    const img = document.createElement("img");
+
+                    img.src = this.image_;
+                    img.style.width = "100%";
+                    img.style.height = "100%";
+                    img.style.position = "absolute";
+                    this.div_.appendChild(img);
+
+
+                    const panes = this.getPanes();
+
+                    panes.overlayLayer.appendChild(this.div_);
+                }
+                draw() {
+                    const overlayProjection = this.getProjection();
+                    const sw = overlayProjection.fromLatLngToDivPixel(
+                        this.bounds_.getSouthWest()
+                    );
+                    const ne = overlayProjection.fromLatLngToDivPixel(
+                        this.bounds_.getNorthEast()
+                    );
+
+                    if (this.div_) {
+                        this.div_.style.left = sw.x + "px";
+                        this.div_.style.top = ne.y + "px";
+                        this.div_.style.width = ne.x - sw.x + "px";
+                        this.div_.style.height = sw.y - ne.y + "px";
+                    }
+                }
+                onRemove() {
+                    if (this.div_) {
+                        this.div_.parentNode.removeChild(this.div_);
+                        this.div_ = null;
+                    }
+                }
+            }
+
+            const overlay = new USGSOverlay(bounds, srcImage);
+
+            overlay.setMap(map);
+        }
+    </script>
+
+    <script src="app.js"></script>
+
+
+</body>
+
+</html>

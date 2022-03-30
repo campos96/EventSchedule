@@ -3,7 +3,7 @@ var event;
 window.addEventListener('load', (e) => {
 
     $.ajax({
-        url: 'https://localhost:44369/api/events/0ef45384-bf65-46da-bd0f-d6e80287ce2d/Details',
+        url: '/api/events/0ef45384-bf65-46da-bd0f-d6e80287ce2d/Details',
         type: 'GET',
         dataType: 'json',
         data: [],
@@ -17,6 +17,10 @@ window.addEventListener('load', (e) => {
     });
 
 });
+
+function loadMap() {
+
+}
 
 function loadEvent() {
     console.log(event);
