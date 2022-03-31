@@ -1,28 +1,6 @@
-var event;
 
-window.addEventListener('load', (e) => {
 
-    $.ajax({
-        url: '/api/events/0ef45384-bf65-46da-bd0f-d6e80287ce2d/Details',
-        type: 'GET',
-        dataType: 'json',
-        data: [],
-        success: function (data, textStatus, xhr) {
-            event = data;
-            loadEvent();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.log('Error in Operation');
-        }
-    });
-
-});
-
-function loadMap() {
-
-}
-
-function loadEvent() {
+function loadEvent(event) {
     console.log(event);
 
     var stages = event.Stages;
